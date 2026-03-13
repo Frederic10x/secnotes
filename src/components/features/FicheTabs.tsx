@@ -166,7 +166,7 @@ export default function FicheTabs({
       <Tabs.Content value="fiche">
         <div className="flex gap-12 mt-6">
           {/* Content column — max 72ch for readability */}
-          <div className="max-w-[72ch] flex-shrink-0 w-full lg:w-auto">
+          <div className="flex-1 min-w-0 max-w-[72ch] w-full">
             <MarkdownRenderer content={contentMd} fontSize={fontSize} />
           </div>
 

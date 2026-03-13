@@ -277,7 +277,7 @@ export default async function DashboardPage() {
       {/* ── Stats cards row ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1 — Fiches lues */}
-        <div className="flex-1 bg-surface border border-border rounded-xl p-5">
+        <div className="flex-1 min-w-0 overflow-hidden bg-surface border border-border rounded-xl p-5">
           <p className="text-sm text-muted">Fiches lues</p>
           <p className="text-3xl font-bold mt-1 text-text">
             {read}/{total}
@@ -289,7 +289,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Card 2 — Flashcards dues */}
-        <div className="flex-1 bg-surface border border-border rounded-xl p-5">
+        <div className="flex-1 min-w-0 overflow-hidden bg-surface border border-border rounded-xl p-5">
           <p className="text-sm text-muted">Flashcards dues</p>
           <p className="text-3xl font-bold mt-1 text-text">{due}</p>
           <Bar value={100} color="#F97316" className="h-1.5 mt-3" />
@@ -305,7 +305,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Card 3 — Quiz complétés */}
-        <div className="flex-1 bg-surface border border-border rounded-xl p-5">
+        <div className="flex-1 min-w-0 overflow-hidden bg-surface border border-border rounded-xl p-5">
           <p className="text-sm text-muted">Quiz complétés</p>
           <p className="text-3xl font-bold mt-1 text-text">{completed}</p>
           <Bar value={100} color="#22C55E" className="h-1.5 mt-3" />
@@ -317,7 +317,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Card 4 — Streak */}
-        <div className="flex-1 bg-surface border border-border rounded-xl p-5">
+        <div className="flex-1 min-w-0 overflow-hidden bg-surface border border-border rounded-xl p-5">
           <p className="text-sm text-muted">Streak</p>
           <p className="text-3xl font-bold mt-1 text-text flex items-center gap-2">
             {streak} jour{streak !== 1 ? "s" : ""}
@@ -334,7 +334,7 @@ export default async function DashboardPage() {
       {/* ── Middle row ── */}
       <div className="flex flex-col lg:flex-row gap-4">
         {/* Progression par thème */}
-        <div className="flex-1 bg-surface border border-border rounded-xl p-6">
+        <div className="flex-1 min-w-0 bg-surface border border-border rounded-xl p-6">
           <div className="flex items-center gap-2 mb-5">
             <BarChart2 size={16} style={{ color: "#6366F1" }} />
             <h2 className="font-semibold text-text">Progression par thème</h2>
@@ -364,7 +364,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Révisions sur 30 jours */}
-        <div className="flex-1 bg-surface border border-border rounded-xl p-6">
+        <div className="flex-1 min-w-0 bg-surface border border-border rounded-xl p-6">
           <div className="flex items-center gap-2 mb-5">
             <TrendingUp size={16} style={{ color: "#6366F1" }} />
             <h2 className="font-semibold text-text">Révisions sur 30 jours</h2>
@@ -375,7 +375,7 @@ export default async function DashboardPage() {
               Aucune révision ces 30 derniers jours
             </p>
           ) : (
-            <div className="w-full">
+            <div className="w-full overflow-hidden">
               <ActivityChart data={chartData} />
             </div>
           )}
@@ -385,7 +385,7 @@ export default async function DashboardPage() {
       {/* ── Bottom row ── */}
       <div className="flex flex-col lg:flex-row gap-4">
         {/* Continuer l'apprentissage */}
-        <div className="flex-[2]">
+        <div className="flex-[2] min-w-0">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <GraduationCap size={16} style={{ color: "#6366F1" }} />
@@ -478,7 +478,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Flashcards à réviser */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-4">
             <Zap size={16} style={{ color: "#F97316" }} />
             <h2 className="font-semibold text-text">Flashcards à réviser</h2>

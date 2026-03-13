@@ -43,7 +43,7 @@ export default function RootLayout({
           {/* Document flow: mini rail (mobile) + main content */}
           <div className="flex lg:block min-h-screen">
             <MiniRail />
-            <main className="flex-1 min-h-screen lg:ml-[220px] bg-background">
+            <main className="flex-1 min-h-screen overflow-x-hidden lg:ml-[220px] bg-background">
               {children}
             </main>
           </div>

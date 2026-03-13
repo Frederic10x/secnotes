@@ -307,7 +307,11 @@ export default function MarkdownRenderer({ content, fontSize }: MarkdownRenderer
             return <CodeBlock {...props}>{children}</CodeBlock>;
           },
           table({ children }) {
-            return <table className="w-full border-collapse mb-4">{children}</table>;
+            return (
+              <div className="overflow-x-auto max-w-full">
+                <table className="w-full border-collapse mb-4">{children}</table>
+              </div>
+            );
           },
           th({ children }) {
             return (

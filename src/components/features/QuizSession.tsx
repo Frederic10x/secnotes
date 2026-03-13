@@ -206,7 +206,7 @@ export default function QuizSession({
     return (
       <div className="max-w-2xl mx-auto pt-10 px-4 pb-16">
         {/* Score header card */}
-        <div className="bg-surface border border-border rounded-2xl p-8 flex items-center gap-8">
+        <div className="bg-surface border border-border rounded-2xl p-4 md:p-8 flex flex-wrap items-center gap-4 md:gap-8">
           {/* Left: score circle */}
           <div className="shrink-0">
             <svg width="120" height="120" viewBox="0 0 120 120">
@@ -370,9 +370,9 @@ export default function QuizSession({
       />
       {/* Sticky header */}
       <div className="sticky top-0 bg-background border-b border-border z-10">
-        <div className="flex items-center justify-between px-8 py-4">
-          <div>
-            <h1 className="text-lg font-semibold text-text">Quiz — {breadcrumb}</h1>
+        <div className="flex items-center justify-between px-4 md:px-8 py-4 gap-2">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-lg font-semibold text-text truncate">Quiz — {breadcrumb}</h1>
             <p className="text-sm text-muted">
               Question {currentIndex + 1} / {total}
             </p>
