@@ -72,22 +72,22 @@ export default function FlashcardCard({
 
         {/* Back face */}
         <motion.div
-          className="absolute inset-0 p-8 pt-14 flex flex-col items-center justify-start"
+          className="absolute inset-0 p-4 md:p-8 pt-12 md:pt-14 flex flex-col items-center justify-start overflow-y-auto"
           animate={{ rotateY: isFlipped ? 0 : -180 }}
           transition={{ duration: 0.4, ease: 'easeOut' }}
           style={{ backfaceVisibility: 'hidden' }}
         >
-          <p className="text-lg text-center leading-relaxed">
+          <p className="text-base md:text-lg text-center leading-relaxed break-words w-full whitespace-normal">
             {renderWithCode(answer)}
           </p>
 
           {securityAngle && (
-            <div className="mt-6 w-full border-l-4 border-danger rounded-r-lg p-4 text-left" style={{ background: '#EF444415' }}>
+            <div className="mt-6 w-full border-l-4 border-danger rounded-r-lg p-3 md:p-4 text-left" style={{ background: '#EF444415' }}>
               <div className="flex items-center gap-2 mb-1">
                 <AlertTriangle size={16} className="text-danger flex-shrink-0" />
                 <span className="text-sm font-semibold text-danger">Angle sécurité</span>
               </div>
-              <p className="text-sm text-muted">{securityAngle}</p>
+              <p className="text-xs md:text-sm text-muted break-words">{securityAngle}</p>
             </div>
           )}
         </motion.div>

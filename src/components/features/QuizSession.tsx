@@ -297,38 +297,41 @@ export default function QuizSession({
             return (
               <div
                 key={answer.questionId}
-                className={`border rounded-xl p-4 mb-3 flex items-start ${
+                className={`border rounded-xl p-4 mb-3 w-full min-w-0 flex flex-col gap-2 ${
                   isWrong ? 'bg-danger/5 border-danger/30' : 'bg-surface border-border'
                 }`}
               >
-                {answer.correct ? (
-                  <CheckCircle size={20} className="text-success shrink-0 mt-0.5" />
-                ) : (
-                  <XCircle size={20} className="text-danger shrink-0 mt-0.5" />
+                <div className="flex items-start gap-3 min-w-0">
+                  {answer.correct ? (
+                    <CheckCircle size={20} className="text-success shrink-0 mt-0.5" />
+                  ) : (
+                    <XCircle size={20} className="text-danger shrink-0 mt-0.5" />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm break-words ${isWrong ? 'font-semibold text-text' : 'font-medium text-text'}`}>
+                      {q.question}
+                    </p>
+                    {isWrong && q.explanation && (
+                      <p className="text-danger text-sm mt-1 break-words">{q.explanation}</p>
+                    )}
+                  </div>
+                </div>
+
+                {(q.tag || isWrong) && (
+                  <div className="flex flex-wrap gap-2 items-center pl-9">
+                    {q.tag && (
+                      <span className="text-xs uppercase font-mono bg-surface border border-border px-2 py-0.5 rounded tracking-wider text-muted">
+                        {q.tag}
+                      </span>
+                    )}
+                    {isWrong && (
+                      <a href={returnPath} className="text-xs text-accent flex items-center gap-1">
+                        Voir la fiche
+                        <ExternalLink size={12} />
+                      </a>
+                    )}
+                  </div>
                 )}
-
-                <div className="flex-1 ml-3 min-w-0">
-                  <p className={`font-medium ${isWrong ? 'text-text font-semibold' : 'text-text'}`}>
-                    {q.question}
-                  </p>
-                  {isWrong && q.explanation && (
-                    <p className="text-danger text-sm mt-1">{q.explanation}</p>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-2 shrink-0 ml-3">
-                  {q.tag && (
-                    <span className="text-xs uppercase font-mono bg-surface border border-border px-2 py-0.5 rounded tracking-wider text-muted">
-                      {q.tag}
-                    </span>
-                  )}
-                  {isWrong && (
-                    <a href={returnPath} className="text-xs text-accent flex items-center gap-1">
-                      Voir la fiche
-                      <ExternalLink size={12} />
-                    </a>
-                  )}
-                </div>
               </div>
             );
           })}
@@ -438,28 +441,28 @@ export default function QuizSession({
 
             if (phase === 'question') {
               cardClass = isSelected
-                ? 'bg-accent/10 border-2 border-accent rounded-xl p-4 flex items-center gap-4 cursor-pointer transition-colors duration-150'
-                : 'bg-surface border border-border rounded-xl p-4 flex items-center gap-4 cursor-pointer hover:bg-surface hover:border-border transition-colors duration-150';
+                ? 'bg-accent/10 border-2 border-accent rounded-xl p-3 md:p-4 flex items-start gap-3 md:gap-4 cursor-pointer transition-colors duration-150'
+                : 'bg-surface border border-border rounded-xl p-3 md:p-4 flex items-start gap-3 md:gap-4 cursor-pointer hover:bg-surface hover:border-border transition-colors duration-150';
               badgeClass = isSelected
-                ? 'w-8 h-8 rounded-lg bg-accent text-white font-mono text-sm flex items-center justify-center flex-shrink-0'
-                : 'w-8 h-8 rounded-lg bg-background border border-border text-muted font-mono text-sm flex items-center justify-center flex-shrink-0';
+                ? 'w-8 h-8 rounded-lg bg-accent text-white font-mono text-sm flex items-center justify-center flex-shrink-0 self-start mt-0.5'
+                : 'w-8 h-8 rounded-lg bg-background border border-border text-muted font-mono text-sm flex items-center justify-center flex-shrink-0 self-start mt-0.5';
             } else {
               if (isRight) {
                 cardClass =
-                  'bg-success/10 border border-success rounded-xl p-4 flex items-center gap-4';
+                  'bg-success/10 border border-success rounded-xl p-3 md:p-4 flex items-start gap-3 md:gap-4';
                 badgeClass =
-                  'w-8 h-8 rounded-lg bg-success text-white font-mono text-sm flex items-center justify-center flex-shrink-0';
+                  'w-8 h-8 rounded-lg bg-success text-white font-mono text-sm flex items-center justify-center flex-shrink-0 self-start mt-0.5';
               } else if (isWrong) {
                 cardClass =
-                  'bg-danger/10 border border-danger rounded-xl p-4 flex items-center gap-4';
+                  'bg-danger/10 border border-danger rounded-xl p-3 md:p-4 flex items-start gap-3 md:gap-4';
                 badgeClass =
-                  'w-8 h-8 rounded-lg bg-danger text-white font-mono text-sm flex items-center justify-center flex-shrink-0';
+                  'w-8 h-8 rounded-lg bg-danger text-white font-mono text-sm flex items-center justify-center flex-shrink-0 self-start mt-0.5';
               } else {
                 cardClass = isOther
-                  ? 'bg-surface border border-border rounded-xl p-4 flex items-center gap-4 opacity-40'
-                  : 'bg-surface border border-border rounded-xl p-4 flex items-center gap-4';
+                  ? 'bg-surface border border-border rounded-xl p-3 md:p-4 flex items-start gap-3 md:gap-4 opacity-40'
+                  : 'bg-surface border border-border rounded-xl p-3 md:p-4 flex items-start gap-3 md:gap-4';
                 badgeClass =
-                  'w-8 h-8 rounded-lg bg-background border border-border text-muted font-mono text-sm flex items-center justify-center flex-shrink-0';
+                  'w-8 h-8 rounded-lg bg-background border border-border text-muted font-mono text-sm flex items-center justify-center flex-shrink-0 self-start mt-0.5';
               }
             }
 
@@ -468,10 +471,10 @@ export default function QuizSession({
                 key={i}
                 onClick={() => phase === 'question' && setSelectedOption(i)}
                 disabled={phase === 'answer'}
-                className={`${cardClass} text-left w-full`}
+                className={`${cardClass} text-left w-full min-h-[48px] h-auto`}
               >
                 <span className={badgeClass}>{LETTERS[i]}</span>
-                <span className="text-sm text-text flex-1">{option}</span>
+                <span className="text-sm text-text flex-1 break-words min-w-0 whitespace-normal">{option}</span>
                 {phase === 'answer' && isRight && (
                   <CheckCircle size={18} className="text-success flex-shrink-0" />
                 )}

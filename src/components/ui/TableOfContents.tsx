@@ -1,6 +1,6 @@
-'use client';
-import { useState, useEffect } from 'react';
-import { cn } from '@/lib/utils';
+"use client";
+import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 interface Heading {
   id: string;
@@ -13,7 +13,7 @@ interface TableOfContentsProps {
 }
 
 export default function TableOfContents({ headings }: TableOfContentsProps) {
-  const [activeId, setActiveId] = useState<string>('');
+  const [activeId, setActiveId] = useState<string>("");
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -22,7 +22,7 @@ export default function TableOfContents({ headings }: TableOfContentsProps) {
           if (entry.isIntersecting) setActiveId(entry.target.id);
         });
       },
-      { rootMargin: '-20% 0% -70% 0%' },
+      { rootMargin: "-20% 0% -70% 0%" },
     );
     headings.forEach((h) => {
       const el = document.getElementById(h.id);
@@ -34,7 +34,7 @@ export default function TableOfContents({ headings }: TableOfContentsProps) {
   if (headings.length === 0) return null;
 
   return (
-    <div className="sticky top-6 bg-surface rounded-lg p-4 border border-border">
+    <div className="sticky top-6 bg-surface rounded-lg py-6 px-12 border border-border">
       <p className="text-xs font-semibold uppercase text-muted mb-3 tracking-wider">
         DANS CETTE FICHE
       </p>
@@ -47,10 +47,10 @@ export default function TableOfContents({ headings }: TableOfContentsProps) {
                 key={h.id}
                 href={`#${h.id}`}
                 className={cn(
-                  'text-sm py-1 block transition-colors',
+                  "text-sm py-1 block transition-colors",
                   isActive
-                    ? 'text-accent border-l-2 border-accent pl-2'
-                    : 'text-muted hover:text-text',
+                    ? "text-accent border-l-2 border-accent pl-2"
+                    : "text-muted hover:text-text",
                 )}
               >
                 {h.text}
@@ -62,10 +62,10 @@ export default function TableOfContents({ headings }: TableOfContentsProps) {
               key={h.id}
               href={`#${h.id}`}
               className={cn(
-                'text-sm py-1 block transition-colors',
+                "text-sm py-1 block transition-colors",
                 isActive
-                  ? 'text-accent border-l-2 border-accent pl-5'
-                  : 'text-muted hover:text-text pl-3',
+                  ? "text-accent border-l-2 border-accent pl-5"
+                  : "text-muted hover:text-text pl-3",
               )}
             >
               {h.text}

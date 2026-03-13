@@ -225,8 +225,8 @@ export default function FlashcardSession({ cards, nextReviewDate }: FlashcardSes
       />
       {/* Sticky header */}
       <div className="sticky top-0 bg-background border-b border-border z-10">
-        <div className="flex items-center justify-between px-8 py-4">
-          <span className="text-lg font-semibold text-text">
+        <div className="flex items-center justify-between px-4 md:px-8 py-4 gap-2">
+          <span className="text-lg font-semibold text-text truncate min-w-0 flex-1">
             Flashcards — {currentCard.nodeTitle}
           </span>
           <div className="flex items-center gap-4">
@@ -251,7 +251,7 @@ export default function FlashcardSession({ cards, nextReviewDate }: FlashcardSes
       </div>
 
       {/* Content area */}
-      <div className="flex-1 flex flex-col items-center justify-center p-8">
+      <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-8 pb-20">
         <FlashcardCard
           question={currentCard.question}
           answer={currentCard.answer}
@@ -269,7 +269,7 @@ export default function FlashcardSession({ cards, nextReviewDate }: FlashcardSes
               <div key={quality} className="flex-1 flex flex-col items-center gap-1">
                 <button
                   onClick={() => submitQuality(quality)}
-                  className={`w-full rounded-lg px-6 py-3 font-medium text-sm cursor-pointer transition-colors duration-150 ${className}`}
+                  className={`w-full rounded-lg px-2 md:px-4 py-3 font-medium text-sm cursor-pointer transition-colors duration-150 ${className}`}
                 >
                   {label}
                 </button>
