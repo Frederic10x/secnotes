@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/layout/Providers";
 import Sidebar from "@/components/layout/Sidebar";
+import CommandPalette from "@/components/features/CommandPalette";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -33,6 +34,7 @@ export default function RootLayout({
       <body>
         <Providers>
           <Sidebar />
+          <CommandPalette />
           <main className="ml-[220px] min-h-screen bg-background">
             {children}
           </main>

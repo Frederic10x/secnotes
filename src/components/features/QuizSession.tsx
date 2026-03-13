@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, BarChart2, RefreshCw, ArrowLeft, ExternalLink } from 'lucide-react';
 import type { QuizQuestion, Tag } from '@/types';
 import { saveQuizSession } from '@/actions/quiz';
 
@@ -187,55 +187,146 @@ export default function QuizSession({
   // ── Results view ─────────────────────────────────────────────────────────────
   if (phase === 'finished') {
     const correct = answers.filter((a) => a.correct).length;
+    const wrong = answers.length - correct;
     const pct = answers.length > 0 ? Math.round((correct / answers.length) * 100) : 0;
-    const scoreColor = pct >= 80 ? 'text-success' : pct >= 50 ? 'text-warning' : 'text-danger';
-    const borderColor =
-      pct >= 80 ? 'border-success' : pct >= 50 ? 'border-warning' : 'border-danger';
+    const avgSeconds = answers.length > 0 ? Math.round(timeElapsed / answers.length) : 0;
+
+    const circumference = 2 * Math.PI * 54;
+    const strokeOffset = (1 - pct / 100) * circumference;
+    const strokeColor =
+      pct >= 80 ? 'var(--success)' : pct >= 50 ? 'var(--warning)' : 'var(--danger)';
+
+    const title =
+      pct >= 80 ? 'Excellent travail !' : pct >= 50 ? 'Bon travail !' : 'À retravailler';
     const message =
-      pct >= 80 ? 'Excellent travail !' : pct >= 50 ? 'Bon effort, continuez !' : 'À retravailler';
+      wrong > 0
+        ? `Félicitations, vous avez maîtrisé l'essentiel. Il reste ${wrong} question(s) à revoir sur ce sous-thème.`
+        : 'Parfait ! Vous maîtrisez complètement ce sujet.';
 
     return (
       <div className="max-w-2xl mx-auto pt-10 px-4 pb-16">
-        {/* Score circle */}
-        <div className="flex flex-col items-center">
-          <div
-            className={`w-32 h-32 rounded-full border-4 ${borderColor} flex flex-col items-center justify-center`}
-          >
-            <span className="text-3xl font-bold text-text">
-              {correct}/{answers.length}
-            </span>
-            <span className="text-sm text-muted">Score</span>
+        {/* Score header card */}
+        <div className="bg-surface border border-border rounded-2xl p-8 flex items-center gap-8">
+          {/* Left: score circle */}
+          <div className="shrink-0">
+            <svg width="120" height="120" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="54" fill="none" stroke="#1E2235" strokeWidth="8" />
+              <circle
+                cx="60"
+                cy="60"
+                r="54"
+                fill="none"
+                stroke={strokeColor}
+                strokeWidth="8"
+                strokeLinecap="round"
+                strokeDasharray={circumference}
+                strokeDashoffset={strokeOffset}
+                transform="rotate(-90 60 60)"
+              />
+              <text
+                x="60"
+                y="55"
+                textAnchor="middle"
+                style={{ fontSize: '18px', fontWeight: 'bold', fill: 'var(--text-color)' }}
+              >
+                {correct}/{answers.length}
+              </text>
+              <text
+                x="60"
+                y="72"
+                textAnchor="middle"
+                style={{ fontSize: '12px', fill: 'var(--muted)' }}
+              >
+                {pct}%
+              </text>
+            </svg>
           </div>
-          <p className={`text-5xl font-bold mt-4 ${scoreColor}`}>{pct}%</p>
-          <p className="text-muted mt-2">{message}</p>
-          <p className="text-sm text-muted mt-2">Temps total : {formatTime(timeElapsed)}</p>
+
+          {/* Right: title + message */}
+          <div>
+            <h2 className="text-2xl font-bold text-text">{title}</h2>
+            <p className="text-muted mt-2">{message}</p>
+          </div>
         </div>
 
-        {/* Question review list */}
+        {/* Stats row */}
+        <div className="mt-6 flex gap-4">
+          {/* Correctes */}
+          <div className="flex-1 bg-surface border border-border rounded-xl p-4 relative">
+            <CheckCircle size={20} className="text-success absolute top-4 right-4" />
+            <p className="text-3xl font-bold text-success">{correct}</p>
+            <span className="text-xs bg-success/20 text-success rounded px-1 mt-1 inline-block">
+              +{answers.length > 0 ? Math.round((correct / answers.length) * 100) : 0}%
+            </span>
+            <p className="text-sm text-muted mt-1">Correctes</p>
+          </div>
+
+          {/* Incorrectes */}
+          <div className="flex-1 bg-surface border border-border rounded-xl p-4 relative">
+            <XCircle size={20} className="text-danger absolute top-4 right-4" />
+            <p className="text-3xl font-bold text-danger">{wrong}</p>
+            <span className="text-xs bg-danger/20 text-danger rounded px-1 mt-1 inline-block">
+              -{answers.length > 0 ? Math.round((wrong / answers.length) * 100) : 0}%
+            </span>
+            <p className="text-sm text-muted mt-1">Incorrectes</p>
+          </div>
+
+          {/* Temps moyen */}
+          <div className="flex-1 bg-surface border border-border rounded-xl p-4 relative">
+            <Clock size={20} className="text-warning absolute top-4 right-4" />
+            <p className="text-3xl font-bold text-text">
+              {avgSeconds}s{' '}
+              <span className="text-sm text-muted font-normal">/ question</span>
+            </p>
+            <p className="text-sm text-muted mt-1">Temps moyen</p>
+          </div>
+        </div>
+
+        {/* Question detail list */}
         <div className="mt-8">
-          <h2 className="text-lg font-semibold text-text mb-4">Détail des réponses</h2>
+          <h2 className="flex items-center gap-2 text-lg font-semibold text-text mb-4">
+            <BarChart2 size={20} className="text-accent" />
+            Détail des réponses
+          </h2>
+
           {answers.map((answer) => {
             const q = activeQuestionsRef.current.find((q) => q.id === answer.questionId);
             if (!q) return null;
-            const selectedText =
-              answer.selected >= 0 ? q.options[answer.selected] : 'Passée';
-            const correctText = q.options[q.correct_index];
+            const isWrong = !answer.correct;
 
             return (
               <div
                 key={answer.questionId}
-                className="bg-surface border border-border rounded-xl p-4 mb-3 flex items-start gap-3"
+                className={`border rounded-xl p-4 mb-3 flex items-start ${
+                  isWrong ? 'bg-danger/5 border-danger/30' : 'bg-surface border-border'
+                }`}
               >
                 {answer.correct ? (
-                  <CheckCircle size={20} className="text-success flex-shrink-0 mt-0.5" />
+                  <CheckCircle size={20} className="text-success shrink-0 mt-0.5" />
                 ) : (
-                  <XCircle size={20} className="text-danger flex-shrink-0 mt-0.5" />
+                  <XCircle size={20} className="text-danger shrink-0 mt-0.5" />
                 )}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-text line-clamp-1">{q.question}</p>
-                  <p className="text-sm text-muted mt-1">Votre réponse : {selectedText}</p>
-                  {!answer.correct && (
-                    <p className="text-sm text-success mt-0.5">+ Bonne réponse : {correctText}</p>
+
+                <div className="flex-1 ml-3 min-w-0">
+                  <p className={`font-medium ${isWrong ? 'text-text font-semibold' : 'text-text'}`}>
+                    {q.question}
+                  </p>
+                  {isWrong && q.explanation && (
+                    <p className="text-danger text-sm mt-1">{q.explanation}</p>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0 ml-3">
+                  {q.tag && (
+                    <span className="text-xs uppercase font-mono bg-surface border border-border px-2 py-0.5 rounded tracking-wider text-muted">
+                      {q.tag}
+                    </span>
+                  )}
+                  {isWrong && (
+                    <a href={returnPath} className="text-xs text-accent flex items-center gap-1">
+                      Voir la fiche
+                      <ExternalLink size={12} />
+                    </a>
                   )}
                 </div>
               </div>
@@ -244,26 +335,21 @@ export default function QuizSession({
         </div>
 
         {/* Actions */}
-        <div className="mt-8 flex gap-3">
-          <button
-            onClick={() => router.push(returnPath)}
-            className="flex-1 px-5 py-2.5 rounded-lg border border-accent text-accent text-sm font-medium hover:bg-accent/10 transition-colors duration-150 cursor-pointer"
-          >
-            Retour à la fiche
-          </button>
+        <div className="mt-8 flex gap-3 justify-center">
           <button
             onClick={handleReset}
-            className="flex-1 px-5 py-2.5 rounded-lg border border-accent text-accent text-sm font-medium hover:bg-accent/10 transition-colors duration-150 cursor-pointer"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-border text-text text-sm font-medium hover:border-accent hover:text-accent transition-colors duration-150 cursor-pointer"
           >
-            Réessayer le quiz
+            <RefreshCw size={16} />
+            Recommencer le quiz
           </button>
-          <button
-            onClick={handleRetryWrong}
-            disabled={pct === 100}
-            className="flex-1 px-5 py-2.5 rounded-lg bg-accent text-white text-sm font-medium hover:bg-[#4F46E5] transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none"
+          <a
+            href={returnPath}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-accent text-white text-sm font-medium hover:bg-[#4F46E5] transition-colors duration-150"
           >
-            Retenter les erreurs
-          </button>
+            <ArrowLeft size={16} />
+            Retour aux fiches
+          </a>
         </div>
       </div>
     );

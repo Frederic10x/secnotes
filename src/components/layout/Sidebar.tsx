@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { Search, Settings, ShieldCheck } from "lucide-react";
+import { Settings, ShieldCheck } from "lucide-react";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import type { Node, NodeWithChildren, Tag } from "@/types";
 import NodeTree from "./NodeTree";
+import SidebarSearchButton from "./SidebarSearchButton";
 
 // Build a recursive tree from a flat list of nodes
 function buildTree(nodes: Node[]): NodeWithChildren[] {
@@ -109,18 +110,7 @@ export default async function Sidebar() {
 
       {/* Bottom: Search + Settings */}
       <div className="shrink-0 border-t border-border px-3 py-2 flex flex-col gap-0.5">
-        {/* Search button — opens ⌘K (CommandPalette placeholder) */}
-        <button
-          className="flex items-center gap-2.5 w-full px-2 py-2 rounded-md text-[13px] text-muted hover:text-text hover:bg-background transition-colors duration-150 cursor-pointer"
-          aria-label="Ouvrir la recherche"
-          data-command-palette-trigger
-        >
-          <Search size={14} className="shrink-0" />
-          <span className="flex-1 text-left">Rechercher</span>
-          <kbd className="text-[10px] bg-border text-muted px-1.5 py-0.5 rounded font-mono">
-            ⌘K
-          </kbd>
-        </button>
+        <SidebarSearchButton />
 
         <Link
           href="/settings"

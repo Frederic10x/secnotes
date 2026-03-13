@@ -36,10 +36,8 @@ export default async function ThemeSlugPage({ params }: Props) {
   const children: Node[] = childrenData ?? [];
 
   return (
-    <FolderPage
-      node={node}
-      children={children}
-      basePath={`/themes/${slug}`}
-    />
+    <FolderPage node={node} basePath={`/themes/${slug}`}>
+      {children}
+    </FolderPage>
   );
 }
