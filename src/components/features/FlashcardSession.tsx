@@ -7,6 +7,7 @@ import { CheckCircle, ExternalLink } from 'lucide-react';
 import type { Flashcard } from '@/types';
 import FlashcardCard from './FlashcardCard';
 import { updateFlashcard } from '@/actions/flashcards';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 export type SessionCard = Flashcard & {
   nodeTitle: string;
@@ -56,6 +57,7 @@ export default function FlashcardSession({ cards, nextReviewDate }: FlashcardSes
   const [isFlipped, setIsFlipped] = useState(false);
   const [results, setResults] = useState<{ cardId: string; quality: 0 | 1 | 2 | 3 }[]>([]);
   const [phase, setPhase] = useState<'session' | 'finished'>(cards.length === 0 ? 'finished' : 'session');
+  const [showTerminerDialog, setShowTerminerDialog] = useState(false);
 
   const total = sessionCards.length;
   const currentCard = sessionCards[currentIndex];
@@ -98,9 +100,7 @@ export default function FlashcardSession({ cards, nextReviewDate }: FlashcardSes
   }, [isFlipped, phase, submitQuality]);
 
   const handleTerminer = () => {
-    if (window.confirm('Terminer la session maintenant ?')) {
-      router.push('/');
-    }
+    setShowTerminerDialog(true);
   };
 
   const handleRestartFails = () => {
@@ -213,6 +213,16 @@ export default function FlashcardSession({ cards, nextReviewDate }: FlashcardSes
 
   return (
     <div className="flex flex-col min-h-screen">
+      <ConfirmDialog
+        open={showTerminerDialog}
+        title="Terminer la session ?"
+        description="Votre progression sera perdue."
+        confirmLabel="Terminer"
+        cancelLabel="Annuler"
+        variant="danger"
+        onConfirm={() => router.push('/')}
+        onCancel={() => setShowTerminerDialog(false)}
+      />
       {/* Sticky header */}
       <div className="sticky top-0 bg-background border-b border-border z-10">
         <div className="flex items-center justify-between px-8 py-4">

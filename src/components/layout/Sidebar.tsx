@@ -52,14 +52,17 @@ export default async function Sidebar() {
       aria-label="Navigation principale"
     >
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-4 py-5 shrink-0">
+      <Link
+        href="/"
+        className="flex items-center gap-2.5 px-4 py-5 shrink-0 hover:opacity-80 transition-opacity cursor-pointer"
+      >
         <div className="w-7 h-7 rounded-md bg-accent flex items-center justify-center shrink-0">
           <ShieldCheck size={15} className="text-white" />
         </div>
         <span className="font-semibold text-[15px] text-text tracking-tight">
           SecNotes
         </span>
-      </div>
+      </Link>
 
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden pb-2">

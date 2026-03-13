@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Clock, CheckCircle, XCircle, BarChart2, RefreshCw, ArrowLeft, ExternalLink } from 'lucide-react';
 import type { QuizQuestion, Tag } from '@/types';
 import { saveQuizSession } from '@/actions/quiz';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 interface Props {
   questions: QuizQuestion[];
@@ -62,6 +63,7 @@ export default function QuizSession({
   const [isSkipped, setIsSkipped] = useState<boolean[]>(() =>
     new Array(questions.length).fill(false),
   );
+  const [showAbandonDialog, setShowAbandonDialog] = useState(false);
 
   // Refs to capture latest state in effects without stale closures
   const answersRef = useRef(answers);
@@ -132,9 +134,7 @@ export default function QuizSession({
   }, [phase, currentIndex, total, currentQuestion]);
 
   const handleAbandon = () => {
-    if (window.confirm('Abandonner le quiz ? Votre progression sera perdue.')) {
-      router.push(returnPath);
-    }
+    setShowAbandonDialog(true);
   };
 
   const handleReset = () => {
@@ -358,6 +358,16 @@ export default function QuizSession({
   // ── Question view ─────────────────────────────────────────────────────────────
   return (
     <div className="flex flex-col min-h-screen">
+      <ConfirmDialog
+        open={showAbandonDialog}
+        title="Abandonner le quiz ?"
+        description="Votre progression sera perdue."
+        confirmLabel="Abandonner"
+        cancelLabel="Annuler"
+        variant="danger"
+        onConfirm={() => router.push(returnPath)}
+        onCancel={() => setShowAbandonDialog(false)}
+      />
       {/* Sticky header */}
       <div className="sticky top-0 bg-background border-b border-border z-10">
         <div className="flex items-center justify-between px-8 py-4">
