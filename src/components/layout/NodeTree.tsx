@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { ChevronRight, ChevronDown } from "lucide-react";
@@ -28,10 +28,21 @@ function NodeRow({
 }) {
   const pathname = usePathname();
   const href = buildHref(pathSegments, node.slug);
-  const isActive = pathname === href || pathname.startsWith(href + "/");
+  const isActive = pathname === href;
+
+  const segments = pathname.split("/").filter(Boolean);
+  const isInActivePath = segments.includes(node.slug);
 
   const hasChildren = node.children.length > 0;
-  const [expanded, setExpanded] = useState(isActive || depth === 0);
+  const [expanded, setExpanded] = useState(() => segments.includes(node.slug));
+
+  useEffect(() => {
+    const currentSegments = pathname.split("/").filter(Boolean);
+    if (currentSegments.includes(node.slug)) {
+      setExpanded(true);
+    }
+    // Do NOT auto-collapse — only auto-expand on navigation
+  }, [pathname, node.slug]);
 
   const dotColor = node.color ?? "#6366F1";
 
@@ -45,7 +56,7 @@ function NodeRow({
         {/* Active left border — only for fiche nodes */}
         {isActive && node.type === 'fiche' && (
           <span
-            className="absolute left-0 top-0 bottom-0 w-[3px] bg-accent rounded-r"
+            className="absolute left-0 top-0 bottom-0 w-0.5 bg-accent rounded-r"
             aria-hidden
           />
         )}
@@ -81,9 +92,9 @@ function NodeRow({
             "flex-1 py-1 text-[13px] leading-none truncate transition-colors duration-150 cursor-pointer",
             "rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2",
             isActive && node.type === 'fiche'
-              ? "text-text font-medium bg-surface"
-              : isActive && node.type === 'folder'
-                ? "text-text font-medium"
+              ? "text-foreground font-medium bg-surface"
+              : isInActivePath && node.type === 'folder'
+                ? "text-foreground font-medium"
                 : "text-muted hover:text-text hover:bg-surface",
           ].join(" ")}
           style={{
