@@ -51,33 +51,35 @@
 
 :root {
   /* Design tokens — dark-first (no separate .dark override needed) */
-  --background: #0A0C14;
-  --surface:    #141624;
-  --border:     #1E2235;
-  --accent:     #6366F1;
-  --text-color: #E2E8F0;
-  --muted:      #64748B;
-  --success:    #22C55E;
-  --warning:    #F59E0B;
-  --danger:     #EF4444;
-  --teal:       #14B8A6;
-  --orange:     #F97316;
-  --radius:     0.625rem;
+  --background:      #0A0C14;
+  --surface:         #141624;
+  --border:          #1E2235;
+  --accent:          #6366F1;
+  --text-color:      #E2E8F0;
+  --muted:           #64748B;
+  --success:         #22C55E;
+  --warning:         #F59E0B;
+  --danger:          #EF4444;
+  --teal:            #14B8A6;
+  --orange:          #F97316;
+  --radius:          0.625rem;
+  --progress-track:  #1E2235;
 }
 
 /* Light mode overrides */
 html.light {
-  --background: #F8FAFC;
-  --surface:    #FFFFFF;
-  --border:     #E2E8F0;
-  --accent:     #6366F1;
-  --text-color: #0F172A;
-  --muted:      #64748B;
-  --success:    #16A34A;
-  --warning:    #D97706;
-  --danger:     #DC2626;
-  --teal:       #0D9488;
-  --orange:     #EA580C;
+  --background:      #F8FAFC;
+  --surface:         #FFFFFF;
+  --border:          #E2E8F0;
+  --accent:          #6366F1;
+  --text-color:      #0F172A;
+  --muted:           #64748B;
+  --success:         #16A34A;
+  --warning:         #D97706;
+  --danger:          #DC2626;
+  --teal:            #0D9488;
+  --orange:          #EA580C;
+  --progress-track:  #E2E8F0;
 }
 
 /* =============================================================

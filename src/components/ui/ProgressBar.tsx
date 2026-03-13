@@ -9,7 +9,7 @@ export function ProgressBar({ value, color = "#6366F1", className }: ProgressBar
   return (
     <div
       className={`w-full h-1 rounded-full overflow-hidden${className ? ` ${className}` : ""}`}
-      style={{ backgroundColor: "#1E2235" }}
+      style={{ backgroundColor: "var(--progress-track)" }}
     >
       <div
         className="h-full rounded-full transition-all duration-300"

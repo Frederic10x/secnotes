@@ -11,7 +11,10 @@ import type { Node } from "@/types";
 
 function resolveIcon(iconName: string | null): LucideIcon {
   if (!iconName) return FolderOpen;
-  const icons = LucideIcons as unknown as Record<string, LucideIcon | undefined>;
+  const icons = LucideIcons as unknown as Record<
+    string,
+    LucideIcon | undefined
+  >;
   return icons[iconName] ?? FolderOpen;
 }
 
@@ -32,25 +35,41 @@ interface FolderPageProps {
 
 // ── Component ──────────────────────────────────────────────────────────────────
 
-export default async function FolderPage({ node, children, basePath }: FolderPageProps) {
+export default async function FolderPage({
+  node,
+  children,
+  basePath,
+}: FolderPageProps) {
   // 1. Breadcrumb
   const breadcrumb = await getBreadcrumb(node.id);
 
   // 2. Current node progress
-  const { data: currentProgressRaw } = await supabaseAdmin.rpc("get_node_progress", {
-    node_id: node.id,
-  });
+  const { data: currentProgressRaw } = await supabaseAdmin.rpc(
+    "get_node_progress",
+    {
+      node_id: node.id,
+    },
+  );
   const currentProgress: NodeProgress = (() => {
-    if (!currentProgressRaw) return { total_fiches: 0, read_fiches: 0, progress_pct: 0 };
-    const p = Array.isArray(currentProgressRaw) ? currentProgressRaw[0] : currentProgressRaw;
-    return (p as NodeProgress) ?? { total_fiches: 0, read_fiches: 0, progress_pct: 0 };
+    if (!currentProgressRaw)
+      return { total_fiches: 0, read_fiches: 0, progress_pct: 0 };
+    const p = Array.isArray(currentProgressRaw)
+      ? currentProgressRaw[0]
+      : currentProgressRaw;
+    return (
+      (p as NodeProgress) ?? {
+        total_fiches: 0,
+        read_fiches: 0,
+        progress_pct: 0,
+      }
+    );
   })();
 
   // 3. Children progress
   const childProgressResults = await Promise.all(
     children.map((child) =>
-      supabaseAdmin.rpc("get_node_progress", { node_id: child.id })
-    )
+      supabaseAdmin.rpc("get_node_progress", { node_id: child.id }),
+    ),
   );
   const childProgressMap = new Map<string, NodeProgress>();
   children.forEach((child, i) => {
@@ -62,13 +81,18 @@ export default async function FolderPage({ node, children, basePath }: FolderPag
   });
 
   // 4. Fiche children — read_at + last quiz score
-  const ficheChildIds = children.filter((c) => c.type === "fiche").map((c) => c.id);
+  const ficheChildIds = children
+    .filter((c) => c.type === "fiche")
+    .map((c) => c.id);
   const ficheReadMap = new Map<string, string | null>();
   const quizScoreMap = new Map<string, number | null>();
 
   if (ficheChildIds.length > 0) {
     const [ficheRes, sessionRes] = await Promise.all([
-      supabaseAdmin.from("fiches").select("id, read_at").in("id", ficheChildIds),
+      supabaseAdmin
+        .from("fiches")
+        .select("id, read_at")
+        .in("id", ficheChildIds),
       supabaseAdmin
         .from("review_sessions")
         .select("fiche_id, score, created_at")
@@ -114,7 +138,10 @@ export default async function FolderPage({ node, children, basePath }: FolderPag
             {i === breadcrumbSegments.length - 1 ? (
               <span className="text-text font-medium">{seg.label}</span>
             ) : (
-              <Link href={seg.href} className="text-muted hover:text-text transition-colors duration-150">
+              <Link
+                href={seg.href}
+                className="text-muted hover:text-text transition-colors duration-150"
+              >
                 {seg.label}
               </Link>
             )}
@@ -141,7 +168,9 @@ export default async function FolderPage({ node, children, basePath }: FolderPag
             {currentProgress.total_fiches !== 1 ? "s" : ""} lue
             {currentProgress.read_fiches !== 1 ? "s" : ""}
           </span>
-          <span className="text-accent font-medium">{currentProgress.progress_pct}%</span>
+          <span className="text-accent font-medium">
+            {currentProgress.progress_pct}%
+          </span>
         </div>
         <ProgressBar value={currentProgress.progress_pct} />
       </div>
@@ -267,7 +296,9 @@ function FicheCard({
       </div>
 
       {/* Title */}
-      <h2 className="text-base font-semibold text-text mb-3 leading-snug">{node.title}</h2>
+      <h2 className="text-base font-semibold text-text mb-3 leading-snug">
+        {node.title}
+      </h2>
 
       {/* Footer row */}
       <div className="flex items-center gap-2 flex-wrap">
