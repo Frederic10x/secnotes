@@ -146,7 +146,7 @@ function QuizSummary({
 }
 
 const tabTriggerClass =
-  "px-4 py-2 text-sm text-muted data-[state=active]:text-accent data-[state=active]:font-medium transition-colors -mb-px border-b-2 border-transparent data-[state=active]:border-accent";
+  "px-4 py-2 text-sm text-muted data-[state=active]:text-accent data-[state=active]:font-medium transition-colors -mb-px border-b-2 border-transparent data-[state=active]:border-accent cursor-pointer";
 
 export default function FicheTabs({
   contentMd,

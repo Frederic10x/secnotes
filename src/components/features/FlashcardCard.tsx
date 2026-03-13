@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { AlertTriangle } from 'lucide-react';
+import { motion } from "framer-motion";
+import { AlertTriangle } from "lucide-react";
 
 interface FlashcardCardProps {
   question: string;
@@ -16,9 +16,13 @@ interface FlashcardCardProps {
 function renderWithCode(text: string) {
   const parts = text.split(/(`[^`]+`)/g);
   return parts.map((part, i) => {
-    if (part.startsWith('`') && part.endsWith('`')) {
+    if (part.startsWith("`") && part.endsWith("`")) {
       return (
-        <code key={i} className="font-mono px-1 rounded text-sm" style={{ background: '#1E2235' }}>
+        <code
+          key={i}
+          className="font-mono px-1 rounded text-sm"
+          style={{ background: "#1E2235" }}
+        >
           {part.slice(1, -1)}
         </code>
       );
@@ -57,13 +61,17 @@ export default function FlashcardCard({
       )}
 
       {/* Flip container */}
-      <div style={{ perspective: '1000px' }} className="relative w-full min-h-[320px]">
+      <div
+        style={{ perspective: "1000px" }}
+        className="relative w-full min-h-[320px]"
+      >
         {/* Front face */}
         <motion.div
           className="absolute inset-0 flex items-center justify-center p-8 pt-14"
+          initial={{ rotateY: 0 }}
           animate={{ rotateY: isFlipped ? 180 : 0 }}
-          transition={{ duration: 0.4, ease: 'easeOut' }}
-          style={{ backfaceVisibility: 'hidden' }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          style={{ backfaceVisibility: "hidden" }}
         >
           <p className="text-xl font-medium text-center leading-relaxed">
             {renderWithCode(question)}
@@ -74,20 +82,31 @@ export default function FlashcardCard({
         <motion.div
           className="absolute inset-0 p-4 md:p-8 pt-12 md:pt-14 flex flex-col items-center justify-start overflow-y-auto"
           animate={{ rotateY: isFlipped ? 0 : -180 }}
-          transition={{ duration: 0.4, ease: 'easeOut' }}
-          style={{ backfaceVisibility: 'hidden' }}
+          initial={{ rotateY: -180 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          style={{ backfaceVisibility: "hidden" }}
         >
           <p className="text-base md:text-lg text-center leading-relaxed break-words w-full whitespace-normal">
             {renderWithCode(answer)}
           </p>
 
           {securityAngle && (
-            <div className="mt-6 w-full border-l-4 border-danger rounded-r-lg p-3 md:p-4 text-left" style={{ background: '#EF444415' }}>
+            <div
+              className="mt-6 w-full border-l-4 border-danger rounded-r-lg p-3 md:p-4 text-left"
+              style={{ background: "#EF444415" }}
+            >
               <div className="flex items-center gap-2 mb-1">
-                <AlertTriangle size={16} className="text-danger flex-shrink-0" />
-                <span className="text-sm font-semibold text-danger">Angle sécurité</span>
+                <AlertTriangle
+                  size={16}
+                  className="text-danger flex-shrink-0"
+                />
+                <span className="text-sm font-semibold text-danger">
+                  Angle sécurité
+                </span>
               </div>
-              <p className="text-xs md:text-sm text-muted break-words">{securityAngle}</p>
+              <p className="text-xs md:text-sm text-muted break-words">
+                {securityAngle}
+              </p>
             </div>
           )}
         </motion.div>
