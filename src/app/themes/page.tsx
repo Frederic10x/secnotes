@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { FolderOpen, FolderPlus } from "lucide-react";
+import { FolderOpen } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { ProgressBar } from "@/components/ui/ProgressBar";
+import { EmptyState } from "@/components/ui/EmptyState";
 import type { Node, Tag } from "@/types";
 
 // ── Icon resolver ─────────────────────────────────────────────────────────────
@@ -137,34 +138,20 @@ export default async function ThemesPage({ searchParams }: Props) {
 
   if (allNodes.length === 0) {
     return (
-      <div className="p-6">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-2xl font-bold text-text">Mes thèmes</h1>
-          <button
-            disabled
-            className="px-5 py-2.5 bg-accent text-white text-sm font-medium rounded-lg opacity-40 cursor-not-allowed"
-          >
-            Nouveau thème
-          </button>
-        </div>
-        <div className="flex flex-col items-center justify-center py-24 gap-4">
-          <FolderPlus className="w-12 h-12 text-muted opacity-40" />
-          <p className="text-muted text-sm text-center">
-            Aucun thème — importez votre première fiche
-          </p>
-          <Link
-            href="/settings"
-            className="px-5 py-2.5 bg-accent text-white text-sm font-medium rounded-lg hover:bg-[#4F46E5] transition-colors duration-150"
-          >
-            Aller aux paramètres
-          </Link>
-        </div>
+      <div className="p-4 md:p-8 max-w-screen-xl mx-auto">
+        <h1 className="text-2xl font-bold text-text mb-8">Mes thèmes</h1>
+        <EmptyState
+          icon={FolderOpen}
+          title="Aucun thème disponible"
+          description="Importez votre premier thème pour commencer"
+          action={{ label: "Aller aux paramètres", href: "/settings" }}
+        />
       </div>
     );
   }
 
   return (
-    <div className="p-6">
+    <div className="p-4 md:p-8 max-w-screen-xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-text">Mes thèmes</h1>
         <button
@@ -233,7 +220,7 @@ export default async function ThemesPage({ searchParams }: Props) {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {nodes.map((node) => {
             const progress = progressMap.get(node.id);
             const totalFiches = progress?.total_fiches ?? 0;

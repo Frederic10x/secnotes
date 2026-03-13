@@ -4,6 +4,7 @@ import { supabaseAdmin } from "@/lib/supabase/server";
 import type { Node, NodeWithChildren, Tag } from "@/types";
 import NodeTree from "./NodeTree";
 import SidebarSearchButton from "./SidebarSearchButton";
+import { SidebarWrapper } from "./SidebarWrapper";
 
 // Build a recursive tree from a flat list of nodes
 function buildTree(nodes: Node[]): NodeWithChildren[] {
@@ -37,20 +38,25 @@ function buildTree(nodes: Node[]): NodeWithChildren[] {
 }
 
 export default async function Sidebar() {
-  const [{ data: nodesData }, { data: tagsData }] = await Promise.all([
-    supabaseAdmin.from("nodes").select("*").order("order_index"),
-    supabaseAdmin.from("tags").select("*").order("name", { ascending: true }),
-  ]);
+  const today = new Date().toISOString().split("T")[0];
+
+  const [{ data: nodesData }, { data: tagsData }, { count: dueCount }] =
+    await Promise.all([
+      supabaseAdmin.from("nodes").select("*").order("order_index"),
+      supabaseAdmin.from("tags").select("*").order("name", { ascending: true }),
+      supabaseAdmin
+        .from("flashcards")
+        .select("*", { count: "exact", head: true })
+        .lte("next_review", today),
+    ]);
 
   const nodes: Node[] = nodesData ?? [];
   const tags: Tag[] = tagsData ?? [];
   const tree = buildTree(nodes);
+  const flashcardsDue = dueCount ?? 0;
 
   return (
-    <aside
-      className="fixed left-0 top-0 bottom-0 w-[220px] flex flex-col bg-surface border-r border-border z-40 overflow-hidden"
-      aria-label="Navigation principale"
-    >
+    <SidebarWrapper>
       {/* Logo */}
       <Link
         href="/"
@@ -111,9 +117,31 @@ export default async function Sidebar() {
         )}
       </div>
 
-      {/* Bottom: Search + Settings */}
+      {/* Bottom: Search + Flashcards + Settings */}
       <div className="shrink-0 border-t border-border px-3 py-2 flex flex-col gap-0.5">
         <SidebarSearchButton />
+
+        <Link
+          href="/practice"
+          className="flex items-center gap-2.5 px-2 py-2 rounded-md text-[13px] text-muted hover:text-text hover:bg-background transition-colors duration-150 cursor-pointer"
+        >
+          <span className="text-[13px] leading-none">⚡</span>
+          <span>Flashcards</span>
+          {flashcardsDue > 0 && (
+            <span
+              className="ml-auto flex items-center justify-center text-white font-bold rounded-full leading-none"
+              style={{
+                backgroundColor: "#F97316",
+                fontSize: "11px",
+                minWidth: "20px",
+                height: "20px",
+                padding: "0 4px",
+              }}
+            >
+              {flashcardsDue}
+            </span>
+          )}
+        </Link>
 
         <Link
           href="/settings"
@@ -123,6 +151,6 @@ export default async function Sidebar() {
           <span>Paramètres</span>
         </Link>
       </div>
-    </aside>
+    </SidebarWrapper>
   );
 }

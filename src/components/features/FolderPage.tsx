@@ -170,7 +170,7 @@ export default async function FolderPage({
   // ── Render ───────────────────────────────────────────────────────────────────
 
   return (
-    <div className="p-6">
+    <div className="p-4 md:p-8 max-w-screen-xl mx-auto">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1.5 text-sm mb-6">
         {breadcrumbSegments.map((seg, i) => (

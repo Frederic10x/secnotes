@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import * as Tabs from '@radix-ui/react-tabs';
 import Link from 'next/link';
-import { Brain, HelpCircle } from 'lucide-react';
+import { Brain, HelpCircle, List, X } from 'lucide-react';
 import MarkdownRenderer from '@/components/ui/MarkdownRenderer';
 import TableOfContents from '@/components/ui/TableOfContents';
 import { cn } from '@/lib/utils';
@@ -146,6 +146,8 @@ export default function FicheTabs({
   lastQuizSession,
   ficheFullPath,
 }: FicheTabsProps) {
+  const [tocOpen, setTocOpen] = useState(false);
+
   return (
     <Tabs.Root defaultValue="fiche" className="mt-4">
       <Tabs.List className="flex border-b border-border">
@@ -162,16 +164,60 @@ export default function FicheTabs({
 
       {/* FICHE TAB */}
       <Tabs.Content value="fiche">
-        <div className="flex gap-8 mt-6">
-          <div className="flex-1 min-w-0">
+        <div className="flex gap-12 mt-6">
+          {/* Content column — max 72ch for readability */}
+          <div className="max-w-[72ch] flex-shrink-0 w-full lg:w-auto">
             <MarkdownRenderer content={contentMd} fontSize={fontSize} />
           </div>
+
+          {/* TOC sidebar — takes remaining space, sticky on desktop */}
           {headings.length > 0 && (
-            <div className="w-64 shrink-0 hidden lg:block">
-              <TableOfContents headings={headings} />
+            <div className="flex-1 hidden lg:block">
+              <div className="sticky top-8">
+                <TableOfContents headings={headings} />
+              </div>
             </div>
           )}
         </div>
+
+        {/* Mobile: floating Sommaire button */}
+        {headings.length > 0 && (
+          <>
+            <button
+              onClick={() => setTocOpen(true)}
+              className="fixed bottom-24 right-4 z-40 lg:hidden flex items-center gap-2 bg-surface border border-border rounded-full px-4 py-2 shadow-lg text-sm text-text cursor-pointer"
+            >
+              <List size={16} />
+              Sommaire
+            </button>
+
+            {/* Mobile TOC modal */}
+            {tocOpen && (
+              <>
+                <div
+                  className="fixed inset-0 bg-black/50 z-50 lg:hidden"
+                  onClick={() => setTocOpen(false)}
+                  aria-hidden
+                />
+                <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-surface border-t border-border rounded-t-2xl p-6 max-h-[70vh] overflow-y-auto">
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="font-semibold text-text">Sommaire</p>
+                    <button
+                      onClick={() => setTocOpen(false)}
+                      className="text-muted hover:text-text transition-colors cursor-pointer"
+                      aria-label="Fermer"
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+                  <div onClick={() => setTocOpen(false)}>
+                    <TableOfContents headings={headings} />
+                  </div>
+                </div>
+              </>
+            )}
+          </>
+        )}
       </Tabs.Content>
 
       {/* FLASHCARDS TAB */}

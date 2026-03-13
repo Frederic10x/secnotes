@@ -273,9 +273,9 @@ export default async function DashboardPage() {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="p-6 flex flex-col gap-6">
+    <div className="p-4 md:p-6 flex flex-col gap-6 max-w-screen-xl mx-auto">
       {/* ── Stats cards row ── */}
-      <div className="flex gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1 — Fiches lues */}
         <div className="flex-1 bg-surface border border-border rounded-xl p-5">
           <p className="text-sm text-muted">Fiches lues</p>
@@ -332,7 +332,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* ── Middle row ── */}
-      <div className="flex gap-4">
+      <div className="flex flex-col lg:flex-row gap-4">
         {/* Progression par thème */}
         <div className="flex-1 bg-surface border border-border rounded-xl p-6">
           <div className="flex items-center gap-2 mb-5">
@@ -383,7 +383,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* ── Bottom row ── */}
-      <div className="flex gap-4">
+      <div className="flex flex-col lg:flex-row gap-4">
         {/* Continuer l'apprentissage */}
         <div className="flex-[2]">
           <div className="flex items-center justify-between mb-4">

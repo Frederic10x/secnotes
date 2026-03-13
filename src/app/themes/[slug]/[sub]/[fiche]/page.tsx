@@ -165,7 +165,7 @@ export default async function FichePage({ params }: Props) {
   ];
 
   return (
-    <div className="p-6 pb-20">
+    <div className="px-4 md:px-8 py-6 pb-20 max-w-screen-xl mx-auto">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1.5 text-sm">
         {crumbs.map((crumb, i) => (

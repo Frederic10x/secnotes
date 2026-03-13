@@ -4,6 +4,8 @@ import "./globals.css";
 import Providers from "@/components/layout/Providers";
 import Sidebar from "@/components/layout/Sidebar";
 import CommandPalette from "@/components/features/CommandPalette";
+import { SidebarHamburger } from "@/components/layout/SidebarHamburger";
+import { SidebarMobileOverlay } from "@/components/layout/SidebarMobileOverlay";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -33,9 +35,11 @@ export default function RootLayout({
     >
       <body>
         <Providers>
+          <SidebarHamburger />
+          <SidebarMobileOverlay />
           <Sidebar />
           <CommandPalette />
-          <main className="ml-[220px] min-h-screen bg-background">
+          <main className="lg:ml-[220px] min-h-screen bg-background">
             {children}
           </main>
         </Providers>
