@@ -157,6 +157,52 @@ async function main() {
 
   if (ficheError) throw new Error(`Failed to insert fiche content: ${ficheError.message}`);
 
+  // ── Step 2b: Process tags (optional) ────────────────────────────────────
+
+  const tagsArg = args.tags;
+
+  if (tagsArg) {
+    const tagSlugs = tagsArg.split(',').map((t: string) => t.trim()).filter(Boolean);
+    const tagIds: string[] = [];
+
+    for (const tagSlug of tagSlugs) {
+      const { data: existing } = await supabaseAdmin
+        .from('tags')
+        .select('id')
+        .eq('name', tagSlug)
+        .single();
+
+      if (existing) {
+        tagIds.push(existing.id as string);
+      } else {
+        const { data: newTag, error: tagError } = await supabaseAdmin
+          .from('tags')
+          .insert({ name: tagSlug, color: '#6366F1' })
+          .select('id')
+          .single();
+        if (tagError) throw new Error(`Failed to create tag "${tagSlug}": ${tagError.message}`);
+        tagIds.push(newTag.id as string);
+      }
+    }
+
+    // Delete old fiche_tags for this fiche not in new list
+    if (tagIds.length > 0) {
+      await supabaseAdmin
+        .from('fiche_tags')
+        .delete()
+        .eq('fiche_id', ficheId)
+        .not('tag_id', 'in', `(${tagIds.join(',')})`);
+
+      // Insert new fiche_tags (upsert)
+      await supabaseAdmin.from('fiche_tags').upsert(
+        tagIds.map((tagId) => ({ fiche_id: ficheId, tag_id: tagId })),
+        { onConflict: 'fiche_id,tag_id' },
+      );
+    } else {
+      await supabaseAdmin.from('fiche_tags').delete().eq('fiche_id', ficheId);
+    }
+  }
+
   // ── Step 3: Write to Obsidian ────────────────────────────────────────────
 
   const vaultPath = process.env.OBSIDIAN_VAULT_PATH;

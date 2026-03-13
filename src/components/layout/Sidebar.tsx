@@ -37,12 +37,7 @@ function buildTree(nodes: Node[]): NodeWithChildren[] {
 
 export default async function Sidebar() {
   const [{ data: nodesData }, { data: tagsData }] = await Promise.all([
-    supabaseAdmin
-      .from("nodes")
-      .select("*")
-      .is("parent_id", null)
-      .eq("type", "folder")
-      .order("order_index"),
+    supabaseAdmin.from("nodes").select("*").order("order_index"),
     supabaseAdmin.from("tags").select("*").order("name", { ascending: true }),
   ]);
 

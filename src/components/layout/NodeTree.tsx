@@ -42,8 +42,8 @@ function NodeRow({
         className="group flex items-center gap-1.5 relative"
         style={{ paddingLeft: `${8 + depth * 12}px` }}
       >
-        {/* Active left border */}
-        {isActive && (
+        {/* Active left border — only for fiche nodes */}
+        {isActive && node.type === 'fiche' && (
           <span
             className="absolute left-0 top-0 bottom-0 w-[3px] bg-accent rounded-r"
             aria-hidden
@@ -80,9 +80,11 @@ function NodeRow({
           className={[
             "flex-1 py-1 text-[13px] leading-none truncate transition-colors duration-150 cursor-pointer",
             "rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2",
-            isActive
-              ? "text-text font-medium bg-border"
-              : "text-muted hover:text-text hover:bg-surface",
+            isActive && node.type === 'fiche'
+              ? "text-text font-medium bg-surface"
+              : isActive && node.type === 'folder'
+                ? "text-text font-medium"
+                : "text-muted hover:text-text hover:bg-surface",
           ].join(" ")}
           style={{
             paddingRight: "8px",
