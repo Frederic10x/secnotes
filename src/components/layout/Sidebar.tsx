@@ -40,7 +40,9 @@ export default async function Sidebar() {
     supabaseAdmin
       .from("nodes")
       .select("*")
-      .order("order", { ascending: true }),
+      .is("parent_id", null)
+      .eq("type", "folder")
+      .order("order_index"),
     supabaseAdmin.from("tags").select("*").order("name", { ascending: true }),
   ]);
 
