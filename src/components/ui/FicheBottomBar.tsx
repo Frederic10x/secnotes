@@ -39,7 +39,7 @@ export default function FicheBottomBar({
   }
 
   return (
-    <div className="fixed bottom-0 z-30 left-[220px] right-0 h-16 bg-surface/95 backdrop-blur border-t border-border">
+    <div className="fixed bottom-0 z-30 left-12 right-0 lg:left-[220px] h-16 bg-surface/95 backdrop-blur border-t border-border">
       <div className="flex items-center justify-between px-8 h-full">
         {/* LEFT: previous fiche */}
         {prevFiche ? (

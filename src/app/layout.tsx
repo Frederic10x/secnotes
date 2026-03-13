@@ -4,7 +4,7 @@ import "./globals.css";
 import Providers from "@/components/layout/Providers";
 import Sidebar from "@/components/layout/Sidebar";
 import CommandPalette from "@/components/features/CommandPalette";
-import { SidebarHamburger } from "@/components/layout/SidebarHamburger";
+import { MiniRail } from "@/components/layout/MiniRail";
 import { SidebarMobileOverlay } from "@/components/layout/SidebarMobileOverlay";
 
 const inter = Inter({
@@ -35,13 +35,18 @@ export default function RootLayout({
     >
       <body>
         <Providers>
-          <SidebarHamburger />
+          {/* Fixed elements (overlays, full sidebar, command palette) */}
           <SidebarMobileOverlay />
           <Sidebar />
           <CommandPalette />
-          <main className="lg:ml-[220px] min-h-screen bg-background">
-            {children}
-          </main>
+
+          {/* Document flow: mini rail (mobile) + main content */}
+          <div className="flex lg:block min-h-screen">
+            <MiniRail />
+            <main className="flex-1 min-h-screen lg:ml-[220px] bg-background">
+              {children}
+            </main>
+          </div>
         </Providers>
       </body>
     </html>
