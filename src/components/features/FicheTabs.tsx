@@ -1,12 +1,12 @@
-'use client';
-import { useState } from 'react';
-import * as Tabs from '@radix-ui/react-tabs';
-import Link from 'next/link';
-import { Brain, HelpCircle, List, X } from 'lucide-react';
-import MarkdownRenderer from '@/components/ui/MarkdownRenderer';
-import TableOfContents from '@/components/ui/TableOfContents';
-import { cn } from '@/lib/utils';
-import type { Flashcard } from '@/types';
+"use client";
+import { useState } from "react";
+import * as Tabs from "@radix-ui/react-tabs";
+import Link from "next/link";
+import { Brain, HelpCircle, List, X } from "lucide-react";
+import MarkdownRenderer from "@/components/ui/MarkdownRenderer";
+import TableOfContents from "@/components/ui/TableOfContents";
+import { cn } from "@/lib/utils";
+import type { Flashcard } from "@/types";
 
 interface LastQuizSession {
   score: number | null;
@@ -17,7 +17,7 @@ interface LastQuizSession {
 
 interface FicheTabsProps {
   contentMd: string;
-  fontSize: 'sm' | 'md' | 'lg';
+  fontSize: "sm" | "md" | "lg";
   headings: { id: string; text: string; level: 2 | 3 }[];
   flashcards: Flashcard[];
   quizCount: number;
@@ -26,14 +26,20 @@ interface FicheTabsProps {
 }
 
 function formatDateFr(dateStr: string): string {
-  return new Intl.DateTimeFormat('fr-FR', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
+  return new Intl.DateTimeFormat("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
   }).format(new Date(dateStr));
 }
 
-function EmptyState({ icon: Icon, message }: { icon: React.ElementType; message: string }) {
+function EmptyState({
+  icon: Icon,
+  message,
+}: {
+  icon: React.ElementType;
+  message: string;
+}) {
   return (
     <div className="flex flex-col items-center justify-center py-16 text-muted gap-3">
       <Icon size={40} className="opacity-40" />
@@ -44,7 +50,7 @@ function EmptyState({ icon: Icon, message }: { icon: React.ElementType; message:
 
 function FlashcardItem({ card }: { card: Flashcard }) {
   const [revealed, setRevealed] = useState(false);
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toISOString().split("T")[0];
   const isDue = card.next_review <= today;
   const daysUntil = isDue
     ? 0
@@ -58,7 +64,9 @@ function FlashcardItem({ card }: { card: Flashcard }) {
       {/* Due badge top-right */}
       <div className="absolute top-3 right-3">
         {isDue ? (
-          <span className="bg-warning/20 text-warning text-xs px-2 py-0.5 rounded">Due</span>
+          <span className="bg-warning/20 text-warning text-xs px-2 py-0.5 rounded">
+            Due
+          </span>
         ) : (
           <span className="bg-surface text-muted text-xs px-2 py-0.5 rounded border border-border">
             Dans {daysUntil}j
@@ -74,7 +82,7 @@ function FlashcardItem({ card }: { card: Flashcard }) {
         onClick={() => setRevealed((v) => !v)}
         className="mt-3 text-xs text-accent hover:text-accent/80 transition-colors cursor-pointer"
       >
-        {revealed ? 'Masquer la réponse' : 'Voir la réponse'}
+        {revealed ? "Masquer la réponse" : "Voir la réponse"}
       </button>
 
       {/* Answer (revealed) */}
@@ -82,7 +90,9 @@ function FlashcardItem({ card }: { card: Flashcard }) {
         <div className="mt-2 pt-2 border-t border-border">
           <p className="text-muted">{card.answer}</p>
           {card.security_angle && (
-            <p className="italic text-muted text-sm mt-1">{card.security_angle}</p>
+            <p className="italic text-muted text-sm mt-1">
+              {card.security_angle}
+            </p>
           )}
         </div>
       )}
@@ -102,22 +112,23 @@ function QuizSummary({
   return (
     <div className="bg-surface border border-border rounded-lg p-6">
       <p className="text-lg font-medium text-text mb-4">
-        {quizCount} question{quizCount > 1 ? 's' : ''} disponible{quizCount > 1 ? 's' : ''}
+        {quizCount} question{quizCount > 1 ? "s" : ""} disponible
+        {quizCount > 1 ? "s" : ""}
       </p>
       {lastSession && lastSession.score !== null && (
         <div className="mb-4">
           <p
             className={cn(
-              'font-medium',
+              "font-medium",
               lastSession.score >= 80
-                ? 'text-success'
+                ? "text-success"
                 : lastSession.score >= 50
-                  ? 'text-warning'
-                  : 'text-danger',
+                  ? "text-warning"
+                  : "text-danger",
             )}
           >
-            Dernier score : {lastSession.cards_correct}/{lastSession.cards_total} (
-            {lastSession.score}%)
+            Dernier score : {lastSession.cards_correct}/
+            {lastSession.cards_total} ({lastSession.score}%)
           </p>
           <p className="text-sm text-muted mt-1">
             Passé le {formatDateFr(lastSession.created_at)}
@@ -135,7 +146,7 @@ function QuizSummary({
 }
 
 const tabTriggerClass =
-  'px-4 py-2 text-sm text-muted data-[state=active]:text-accent data-[state=active]:font-medium transition-colors -mb-px border-b-2 border-transparent data-[state=active]:border-accent';
+  "px-4 py-2 text-sm text-muted data-[state=active]:text-accent data-[state=active]:font-medium transition-colors -mb-px border-b-2 border-transparent data-[state=active]:border-accent";
 
 export default function FicheTabs({
   contentMd,
@@ -172,7 +183,7 @@ export default function FicheTabs({
 
           {/* TOC sidebar — takes remaining space, sticky on desktop */}
           {headings.length > 0 && (
-            <div className="flex-1 hidden lg:block">
+            <div className="shrink-1 hidden lg:block">
               <div className="sticky top-8">
                 <TableOfContents headings={headings} />
               </div>
@@ -224,7 +235,10 @@ export default function FicheTabs({
       <Tabs.Content value="flashcards">
         <div className="mt-6">
           {flashcards.length === 0 ? (
-            <EmptyState icon={Brain} message="Aucune flashcard pour cette fiche" />
+            <EmptyState
+              icon={Brain}
+              message="Aucune flashcard pour cette fiche"
+            />
           ) : (
             <>
               {flashcards.map((card) => (
@@ -247,7 +261,10 @@ export default function FicheTabs({
       <Tabs.Content value="quiz">
         <div className="mt-6 max-w-xl">
           {quizCount === 0 ? (
-            <EmptyState icon={HelpCircle} message="Aucune question pour cette fiche" />
+            <EmptyState
+              icon={HelpCircle}
+              message="Aucune question pour cette fiche"
+            />
           ) : (
             <QuizSummary
               quizCount={quizCount}
