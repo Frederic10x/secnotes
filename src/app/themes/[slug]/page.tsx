@@ -5,10 +5,12 @@ import type { Node } from "@/types";
 
 interface Props {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ tag?: string }>;
 }
 
-export default async function ThemeSlugPage({ params }: Props) {
+export default async function ThemeSlugPage({ params, searchParams }: Props) {
   const { slug } = await params;
+  const { tag: tagFilter } = await searchParams;
 
   // 1. Resolve root node by slug (parent_id IS NULL)
   const { data: nodeData } = await supabaseAdmin
@@ -36,8 +38,11 @@ export default async function ThemeSlugPage({ params }: Props) {
   const children: Node[] = childrenData ?? [];
 
   return (
-    <FolderPage node={node} basePath={`/themes/${slug}`}>
-      {children}
-    </FolderPage>
+    <FolderPage
+      node={node}
+      children={children}
+      basePath={`/themes/${slug}`}
+      tagFilter={tagFilter}
+    />
   );
 }

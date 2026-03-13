@@ -5,7 +5,7 @@ import type { LucideIcon } from "lucide-react";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { getBreadcrumb } from "@/lib/get-breadcrumb";
-import type { Node } from "@/types";
+import type { Node, Tag } from "@/types";
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -31,6 +31,7 @@ interface FolderPageProps {
   children: Node[];
   /** URL path for the current page, e.g. /themes/linux or /themes/linux/fundamentals */
   basePath: string;
+  tagFilter?: string;
 }
 
 // ── Component ──────────────────────────────────────────────────────────────────
@@ -39,6 +40,7 @@ export default async function FolderPage({
   node,
   children,
   basePath,
+  tagFilter,
 }: FolderPageProps) {
   // 1. Breadcrumb
   const breadcrumb = await getBreadcrumb(node.id);
@@ -46,9 +48,7 @@ export default async function FolderPage({
   // 2. Current node progress
   const { data: currentProgressRaw } = await supabaseAdmin.rpc(
     "get_node_progress",
-    {
-      node_id: node.id,
-    },
+    { node_id: node.id },
   );
   const currentProgress: NodeProgress = (() => {
     if (!currentProgressRaw)
@@ -65,14 +65,57 @@ export default async function FolderPage({
     );
   })();
 
-  // 3. Children progress
+  // 3. Tags for fiche children (for filter bar)
+  const ficheChildIds = children
+    .filter((c) => c.type === "fiche")
+    .map((c) => c.id);
+
+  let folderTags: Tag[] = [];
+  let taggedFicheIds = new Set<string>();
+
+  if (ficheChildIds.length > 0) {
+    const { data: ficheTagRows } = await supabaseAdmin
+      .from("fiche_tags")
+      .select("fiche_id, tag_id")
+      .in("fiche_id", ficheChildIds);
+
+    if (ficheTagRows && ficheTagRows.length > 0) {
+      const tagIds = [...new Set(ficheTagRows.map((r) => r.tag_id))];
+      const { data: tagsData } = await supabaseAdmin
+        .from("tags")
+        .select("*")
+        .in("id", tagIds)
+        .order("name");
+      folderTags = tagsData ?? [];
+
+      // Build tagged fiche set if filter is active
+      if (tagFilter) {
+        const activeTagObj = folderTags.find((t) => t.name === tagFilter);
+        if (activeTagObj) {
+          ficheTagRows
+            .filter((ft) => ft.tag_id === activeTagObj.id)
+            .forEach((ft) => taggedFicheIds.add(ft.fiche_id));
+        }
+      }
+    }
+  }
+
+  // 4. Apply tag filter to children (folders always shown)
+  const filteredChildren =
+    tagFilter && ficheChildIds.length > 0
+      ? children.filter(
+          (c) => c.type === "folder" || taggedFicheIds.has(c.id),
+        )
+      : children;
+
+  // 5. Children progress
   const childProgressResults = await Promise.all(
-    children.map((child) =>
+    filteredChildren.map((child) =>
       supabaseAdmin.rpc("get_node_progress", { node_id: child.id }),
     ),
   );
   const childProgressMap = new Map<string, NodeProgress>();
-  children.forEach((child, i) => {
+  filteredChildren.forEach((child, i) => {
     const raw = childProgressResults[i].data;
     if (raw) {
       const p = Array.isArray(raw) ? raw[0] : raw;
@@ -80,29 +123,28 @@ export default async function FolderPage({
     }
   });
 
-  // 4. Fiche children — read_at + last quiz score
-  const ficheChildIds = children
+  // 6. Fiche children — read_at + last quiz score
+  const filteredFicheIds = filteredChildren
     .filter((c) => c.type === "fiche")
     .map((c) => c.id);
   const ficheReadMap = new Map<string, string | null>();
   const quizScoreMap = new Map<string, number | null>();
 
-  if (ficheChildIds.length > 0) {
+  if (filteredFicheIds.length > 0) {
     const [ficheRes, sessionRes] = await Promise.all([
       supabaseAdmin
         .from("fiches")
         .select("id, read_at")
-        .in("id", ficheChildIds),
+        .in("id", filteredFicheIds),
       supabaseAdmin
         .from("review_sessions")
         .select("fiche_id, score, created_at")
-        .in("fiche_id", ficheChildIds)
+        .in("fiche_id", filteredFicheIds)
         .eq("type", "quiz")
         .order("created_at", { ascending: false }),
     ]);
 
     ficheRes.data?.forEach((f) => ficheReadMap.set(f.id, f.read_at));
-    // Keep only the most recent score per fiche
     sessionRes.data?.forEach((s) => {
       if (s.fiche_id && !quizScoreMap.has(s.fiche_id)) {
         quizScoreMap.set(s.fiche_id, s.score);
@@ -115,7 +157,6 @@ export default async function FolderPage({
   const breadcrumbSegments = [
     { label: "Thèmes", href: "/themes" },
     ...breadcrumb.map((n, i) => {
-      // Build the href for each breadcrumb node
       const slugChain = breadcrumb.slice(0, i + 1).map((x) => x.slug);
       return {
         label: n.title,
@@ -161,7 +202,7 @@ export default async function FolderPage({
       </div>
 
       {/* Progress */}
-      <div className="mb-8 max-w-md">
+      <div className="mb-6 max-w-md">
         <div className="flex items-center justify-between text-sm mb-2">
           <span className="text-muted">
             {currentProgress.read_fiches} / {currentProgress.total_fiches} fiche
@@ -175,15 +216,70 @@ export default async function FolderPage({
         <ProgressBar value={currentProgress.progress_pct} />
       </div>
 
+      {/* Tag filter bar */}
+      {folderTags.length > 0 && (
+        <div className="flex items-center gap-2 flex-wrap mb-6">
+          <span className="text-sm text-muted">Filtrer par tag :</span>
+          <Link
+            href={basePath}
+            className={`px-3 py-1 rounded-full text-sm border transition-colors duration-150 cursor-pointer ${
+              !tagFilter
+                ? "bg-accent/20 border-accent text-accent"
+                : "bg-surface border-border text-muted hover:text-text"
+            }`}
+          >
+            Tous
+          </Link>
+          {folderTags.map((tag) => {
+            const isActive = tagFilter === tag.name;
+            return (
+              <Link
+                key={tag.id}
+                href={`${basePath}?tag=${tag.name}`}
+                className="px-3 py-1 rounded-full text-sm border transition-colors duration-150 cursor-pointer"
+                style={
+                  isActive
+                    ? {
+                        backgroundColor: `${tag.color}20`,
+                        borderColor: tag.color,
+                        color: tag.color,
+                      }
+                    : {
+                        backgroundColor: "var(--surface)",
+                        borderColor: "var(--border)",
+                        color: "var(--muted)",
+                      }
+                }
+              >
+                #{tag.name}
+              </Link>
+            );
+          })}
+        </div>
+      )}
+
       {/* Children grid */}
       {children.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 gap-4">
           <FolderOpen className="w-12 h-12 text-muted opacity-40" />
           <p className="text-muted text-sm text-center">Ce dossier est vide</p>
         </div>
+      ) : filteredChildren.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 gap-4">
+          <FileText className="w-12 h-12 text-muted opacity-40" />
+          <p className="text-muted text-sm text-center">
+            Aucune fiche pour le tag #{tagFilter}
+          </p>
+          <Link
+            href={basePath}
+            className="px-5 py-2.5 bg-accent text-white text-sm font-medium rounded-lg hover:bg-[#4F46E5] transition-colors duration-150"
+          >
+            Voir toutes les fiches
+          </Link>
+        </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {children.map((child) => {
+          {filteredChildren.map((child) => {
             const href = `${basePath}/${child.slug}`;
 
             if (child.type === "folder") {
@@ -197,7 +293,6 @@ export default async function FolderPage({
               );
             }
 
-            // type === 'fiche'
             const readAt = ficheReadMap.get(child.id) ?? null;
             const quizScore = quizScoreMap.get(child.id) ?? null;
             return (
