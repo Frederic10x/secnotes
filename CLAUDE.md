@@ -89,27 +89,34 @@ export const supabase = createBrowserClient(
 );
 ```
 
-Règle absolue : SUPABASE*SERVICE_ROLE_KEY uniquement côté serveur.
-Jamais dans un Client Component, jamais dans une variable NEXT_PUBLIC*.
+Règle absolue : SUPABASE_SERVICE_ROLE_KEY uniquement côté serveur.
+Jamais dans un Client Component, jamais dans une variable NEXT_PUBLIC_.
 
 ---
 
 ## Structure des fichiers — Conventions
 
+```
 src/
-├── app/ → pages et layouts (App Router)
+├── app/                    → pages et layouts (App Router)
 ├── components/
-│ ├── layout/ → Sidebar.tsx (unique)
-│ ├── ui/ → composants shadcn + MarkdownRenderer
-│ └── features/ → FlashcardSession, QuizSession, CommandPalette
+│   ├── layout/             → Sidebar.tsx (unique)
+│   ├── ui/                 → composants shadcn + MarkdownRenderer
+│   └── features/           → FlashcardSession, QuizSession, CommandPalette
 ├── lib/
-│ ├── supabase/
-│ │ ├── server.ts → supabaseAdmin (service role)
-│ │ └── client.ts → supabase (anon, browser)
-│ └── utils.ts
-├── actions/ → Server Actions (mutations Supabase)
+│   ├── supabase/
+│   │   ├── server.ts       → supabaseAdmin (service role)
+│   │   └── client.ts       → supabase (anon, browser)
+│   └── utils.ts
+├── actions/                → Server Actions (mutations Supabase)
 └── types/
-└── index.ts → types TypeScript partagés (Node, Fiche, Flashcard...)
+    └── index.ts            → types TypeScript partagés (Node, Fiche, Flashcard...)
+
+scripts/
+├── import-fiche.ts         → import en base + Obsidian
+├── seed-nodes.ts           → seed structure initiale
+└── tmp/                    → fichiers temporaires générés par Claude (gitignored)
+```
 
 ---
 
@@ -162,11 +169,11 @@ Fichier : scripts/import-fiche.ts
 Usage :
 
 ```bash
-npx ts-node scripts/import-fiche.ts \
+npm run import-fiche -- \
   --theme "linux" --subtheme "permissions" \
-  --fiche fiche.md \
-  --flashcards flashcards.json \
-  --quiz quiz.json
+  --fiche scripts/tmp/fiche.md \
+  --flashcards scripts/tmp/flashcards.json \
+  --quiz scripts/tmp/quiz.json
 ```
 
 Format attendu flashcards.json :
@@ -178,28 +185,58 @@ Format attendu flashcards.json :
 Format attendu quiz.json :
 
 ```json
-[
-  {
-    "question": "...",
-    "options": ["A", "B", "C", "D"],
-    "correct_index": 1,
-    "explanation": "...",
-    "tag": "commandes"
-  }
-]
+[{
+  "question": "...",
+  "options": ["A", "B", "C", "D"],
+  "correct_index": 1,
+  "explanation": "...",
+  "tag": "commandes"
+}]
 ```
 
 Étapes du script :
 
-1. Résoudre le node parent par theme/subtheme slugs dans Supabase
-2. Créer node (type=fiche) + insérer le contenu fiche.md dans fiches
-3. Écrire fiche.md dans le vault Obsidian : $OBSIDIAN_VAULT_PATH/[theme]/[subtheme].md
-4. Insérer flashcards[] dans Supabase
-5. Insérer quiz_questions[] dans Supabase
-6. Output : "✅ [theme]/[subtheme] — X flashcards, Y questions"
+1. Résoudre ou créer le node parent :
+   - Chercher folder slug=theme (parent_id IS NULL)
+   - Si absent → créer le node theme (folder, root, color #6366F1)
+   - Chercher folder slug=subtheme avec parent=theme
+   - Si absent → créer le node subtheme (folder, parent=theme, color hérité)
+2. Créer node (type=fiche) + insérer le contenu dans fiches
+   - Si slug existe déjà → UPDATE content_md + updated_at (idempotent)
+3. Écrire fiche.md dans le vault Obsidian :
+   $OBSIDIAN_VAULT_PATH/[theme]/[subtheme]/[slug].md
+   - Créer les dossiers récursivement si absents
+   - Skip silencieusement si OBSIDIAN_VAULT_PATH non défini (warning uniquement)
+4. Insérer flashcards[] — DELETE existantes avant réinsertion (idempotent)
+5. Insérer quiz_questions[] — DELETE existantes avant réinsertion (idempotent)
+6. Supprimer les fichiers dans scripts/tmp/ après import réussi
+7. Output : "✅ [theme]/[subtheme] — X flashcards, Y questions"
 
 Utilise SUPABASE_SERVICE_ROLE_KEY (Node.js, server-side uniquement).
-Le format de génération attendu est décrit dans /CONTEXT.md.
+
+---
+
+## Workflow — Génération et import d'une fiche
+
+Quand l'utilisateur demande une nouvelle fiche, Claude doit :
+
+0. Identifier thème et sous-thème à partir de la demande.
+   Si ambigu → demander confirmation avant de générer.
+1. Générer le contenu (fiche.md, flashcards.json, quiz.json)
+   selon les formats définis ci-dessus.
+2. Écrire les 3 fichiers dans scripts/tmp/ (créer le dossier si absent).
+3. Exécuter automatiquement :
+   ```bash
+   npm run import-fiche -- \
+     --theme "[theme]" --subtheme "[subtheme]" \
+     --fiche scripts/tmp/fiche.md \
+     --flashcards scripts/tmp/flashcards.json \
+     --quiz scripts/tmp/quiz.json
+   ```
+4. Confirmer le résultat à l'utilisateur.
+
+Ne jamais demander à l'utilisateur de lancer le script manuellement.
+Ne jamais laisser de fichiers dans scripts/tmp/ après un import réussi.
 
 ---
 
