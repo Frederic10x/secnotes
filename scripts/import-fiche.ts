@@ -207,9 +207,12 @@ async function main() {
 
   const vaultPath = process.env.OBSIDIAN_VAULT_PATH;
   if (vaultPath) {
+    const obsidianContent = contentMd
+      .replace(/==(red|green|blue|yellow|orange|purple):([^=]+)==/g, '<mark class="hltr-$1">$2</mark>')
+      .replace(/==([^=]+)==/g, '<mark class="hltr-yellow">$1</mark>');
     const targetDir = path.join(vaultPath, theme, subtheme);
     fs.mkdirSync(targetDir, { recursive: true });
-    fs.writeFileSync(path.join(targetDir, `${ficheSlug}.md`), contentMd, 'utf-8');
+    fs.writeFileSync(path.join(targetDir, `${ficheSlug}.md`), obsidianContent, 'utf-8');
   } else {
     console.warn('⚠️  OBSIDIAN_VAULT_PATH not set — skipping Obsidian sync');
   }
