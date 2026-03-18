@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { supabaseAdmin } from '@/lib/supabase/server';
 import FlashcardSession, { type SessionCard } from '@/components/features/FlashcardSession';
 import type { Flashcard, Node } from '@/types';
